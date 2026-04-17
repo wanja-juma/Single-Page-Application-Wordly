@@ -1,116 +1,132 @@
+// Get elements
 const form = document.getElementById("searchForm");
 const input = document.getElementById("wordInput");
 const errorMsg = document.getElementById("error");
 
-const wordEl = document.getElementById("word");
-const phoneticEl = document.getElementById("phonetic");
-const definitionsEl = document.getElementById("definitions");
-const synonymsEl = document.getElementById("synonyms");
+const wordElement = document.getElementById("word");
+const phoneticsElement = document.getElementById("phonetics");
+const definitionsElement = document.getElementById("definitions");
+const synonymsElement = document.getElementById("synonyms");
 
 const audioBtn = document.getElementById("audioBtn");
 const saveBtn = document.getElementById("saveBtn");
 const favList = document.getElementById("favList");
 
+// Variables
 let audioSrc = "";
 let currentWord = "";
 
-form.addEventListener("submit", function(e) {
-  e.preventDefault();
-  fetchWord(input.value.trim());
+// Form submit
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const word = input.value.trim();
+
+  if (word !== "") {
+    getWord(word);
+  }
 });
 
-// clear previous results
+// Clear previous results
 function clearResults() {
-  wordEl.textContent = "";
-  phoneticEl.textContent = "";
-  definitionsEl.innerHTML = "";
-  synonymsEl.innerHTML = "";
+  wordElement.textContent = "";
+  phoneticsElement.textContent = "";
+  definitionsElement.innerHTML = "";
+  synonymsElement.innerHTML = "";
 
-  saveBtn.classList.add("hidden"); // hide save button
-  audioBtn.classList.add("hidden"); // hide audio button
+  audioBtn.classList.add("hidden");
+  saveBtn.classList.add("hidden");
+  errorMsg.classList.add("hidden");
 }
 
-// fetch data from API
-async function fetchWord(word) {
-    clearResults()
-  errorMsg.classList.add("hidden");
+// Fetch word from API
+async function getWord(word) {
+  clearResults();
 
   try {
-    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
 
-    if (!res.ok) throw new Error("Word not found");
+    if (!response.ok) {
+      throw new Error("Word not found");
+    }
 
-    const data = await res.json();
-    displayData(data[0]);
+    const data = await response.json();
+    showWord(data[0]);
 
-  } catch (err) {
-    showError("Word not found. Try another.");
+  } catch (error) {
+    showError("Word not found. Try again.");
   }
 }
 
-// display data on page
-function displayData(data) {
+// Display word data
+function showWord(data) {
   currentWord = data.word;
-  wordEl.textContent = data.word;
-  saveBtn.classList.remove("hidden");
+  wordElement.textContent = data.word;
 
-  phoneticEl.textContent = data.phonetic || "";
+  // phonetics text
+  phoneticsElement.textContent = data.phonetics[0] ?.text || "";
 
-  definitionsEl.innerHTML = "";
-  synonymsEl.innerHTML = "";
+  // definitions
+  data.meanings.forEach((meaning) => {
+    const definition = meaning.definitions[0];
 
-  const meanings = data.meanings;
+    const p = document.createElement("p");
+    p.textContent = `${meaning.partOfSpeech}: ${definition.definition}`;
+    definitionsElement.appendChild(p);
 
-  meanings.forEach(m => {
-    const def = m.definitions[0];
+    if (definition.example) {
+      const example = document.createElement("p");
+      example.textContent = `Example: ${definition.example}`;
+      definitionsElement.appendChild(example);
+    }
 
-    definitionsEl.innerHTML += `
-      <p><strong>${m.partOfSpeech}</strong>: ${def.definition}</p>
-      <p><em>${def.example || ""}</em></p>
-    `;
-
-    if (m.synonyms.length > 0) {
-      synonymsEl.innerHTML += `<p>Synonyms: ${m.synonyms.join(", ")}</p>`;
+    // synonyms
+    if (meaning.synonyms && meaning.synonyms.length > 0) {
+      const syn = document.createElement("p");
+      syn.textContent = `Synonyms: ${meaning.synonyms.join(", ")}`;
+      synonymsElement.appendChild(syn);
     }
   });
-   // Audio
+
+  // audio
   const audio = data.phonetics.find(p => p.audio);
+
   if (audio) {
     audioSrc = audio.audio;
     audioBtn.classList.remove("hidden");
   }
 
   saveBtn.classList.remove("hidden");
-
 }
 
-// audio playback
+// Play audio
 audioBtn.addEventListener("click", () => {
-  const audio = new Audio(audioSrc);
-  audio.play();
-});
-
-// save favorite word
-saveBtn.addEventListener("click", () => {
-  let saved = JSON.parse(localStorage.getItem("words")) || [];
-
-  if (!saved.includes(currentWord)) {
-    saved.push(currentWord);
-    localStorage.setItem("words", JSON.stringify(saved));
-    renderFavorites();
+  if (audioSrc) {
+    new Audio(audioSrc).play();
   }
 });
 
-// render saved words
-function renderFavorites() {
-  favList.innerHTML = "";
-  const saved = JSON.parse(localStorage.getItem("words")) || [];
+// Save word
+saveBtn.addEventListener("click", () => {
+  let words = JSON.parse(localStorage.getItem("words")) || [];
 
-  saved.forEach(word => {
+  if (!words.includes(currentWord)) {
+    words.push(currentWord);
+    localStorage.setItem("words", JSON.stringify(words));
+    displayFavorites();
+  }
+});
+
+// Show saved words
+function displayFavorites() {
+  favList.innerHTML = "";
+
+  let words = JSON.parse(localStorage.getItem("words")) || [];
+
+  words.forEach((word) => {
     const li = document.createElement("li");
     li.textContent = word;
 
-    li.addEventListener("click", () => fetchWord(word));
+    li.addEventListener("click", () => getWord(word));
 
     favList.appendChild(li);
   });
@@ -118,10 +134,10 @@ function renderFavorites() {
   input.value = "";
 }
 
-renderFavorites();
-
-// error handling
-function showError(msg) {
-  errorMsg.textContent = msg;
+// Show error
+function showError(message) {
+  errorMsg.textContent = message;
   errorMsg.classList.remove("hidden");
 }
+
+displayFavorites();

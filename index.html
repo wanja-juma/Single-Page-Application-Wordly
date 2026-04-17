@@ -10,25 +10,17 @@
   <main>
     <h1>Wordly Dictionary</h1>
 
-    <!-- Search Form -->
-    <form id="searchForm" aria-label="Search for a word">
-      <input 
-        type="text" 
-        id="wordInput" 
-        placeholder="Enter a word..." 
-        aria-label="Word input"
-        required
-      >
+    <form id="searchForm">
+      <input type="text" id="wordInput" placeholder="Enter a word..." 
+        required>
       <button type="submit">Search</button>
     </form>
 
-    
     <p id="error" class="hidden"></p>
 
-    
     <section id="results">
       <h2 id="word"></h2>
-      <p id="phonetic"></p>
+      <p id="phonetics"></p>
       <button id="audioBtn" class="hidden">Play Pronunciation</button>
 
       <div id="definitions"></div>

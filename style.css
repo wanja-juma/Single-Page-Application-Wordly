@@ -21,14 +21,14 @@ button {
   padding: 10px 15px;
   margin-left: 5px;
   border: none;
-  background: #007BFF;
+  background: #360676;
   color: white;
   border-radius: 5px;
   cursor: pointer;
 }
 
 button:hover {
-  background: #0056b3;
+  background: #bc51ed;
 }
 
 .hidden {
@@ -48,4 +48,8 @@ button:hover {
 
 #error {
   color: red;
+}
+#favList{
+    list-style: none;
+
 }
