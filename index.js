@@ -1,4 +1,4 @@
-// Get elements
+// Getting elements from html file
 const form = document.getElementById("searchForm");
 const input = document.getElementById("wordInput");
 const errorMsg = document.getElementById("error");
@@ -6,17 +6,17 @@ const errorMsg = document.getElementById("error");
 const wordElement = document.getElementById("word");
 const phoneticsElement = document.getElementById("phonetics");
 const definitionsElement = document.getElementById("definitions");
-const synonymsElement = document.getElementById("synonyms");
+
 
 const audioBtn = document.getElementById("audioBtn");
 const saveBtn = document.getElementById("saveBtn");
 const favList = document.getElementById("favList");
 
-// Variables
+
 let audioSrc = "";
 let currentWord = "";
 
-// Form submit
+// submitting the form
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   const word = input.value.trim();
@@ -26,19 +26,19 @@ form.addEventListener("submit", (event) => {
   }
 });
 
-// Clear previous results
+// Clearing previous results
 function clearResults() {
   wordElement.textContent = "";
   phoneticsElement.textContent = "";
   definitionsElement.innerHTML = "";
-  synonymsElement.innerHTML = "";
+  
 
   audioBtn.classList.add("hidden");
   saveBtn.classList.add("hidden");
   errorMsg.classList.add("hidden");
 }
 
-// Fetch word from API
+// Fetching word from API
 async function getWord(word) {
   clearResults();
 
@@ -62,7 +62,7 @@ function showWord(data) {
   currentWord = data.word;
   wordElement.textContent = data.word;
 
-  // phonetics text
+
   phoneticsElement.textContent = data.phonetics[0] ?.text || "";
 
   // definitions
@@ -78,13 +78,6 @@ function showWord(data) {
       example.textContent = `Example: ${definition.example}`;
       definitionsElement.appendChild(example);
     }
-
-    // synonyms
-    if (meaning.synonyms && meaning.synonyms.length > 0) {
-      const syn = document.createElement("p");
-      syn.textContent = `Synonyms: ${meaning.synonyms.join(", ")}`;
-      synonymsElement.appendChild(syn);
-    }
   });
 
   // audio
@@ -98,14 +91,14 @@ function showWord(data) {
   saveBtn.classList.remove("hidden");
 }
 
-// Play audio
+// Playing audio
 audioBtn.addEventListener("click", () => {
   if (audioSrc) {
     new Audio(audioSrc).play();
   }
 });
 
-// Save word
+// Saving word
 saveBtn.addEventListener("click", () => {
   let words = JSON.parse(localStorage.getItem("words")) || [];
 
@@ -116,7 +109,7 @@ saveBtn.addEventListener("click", () => {
   }
 });
 
-// Show saved words
+// Showing saved words
 function displayFavorites() {
   favList.innerHTML = "";
 
@@ -134,7 +127,7 @@ function displayFavorites() {
   input.value = "";
 }
 
-// Show error
+// Showing error
 function showError(message) {
   errorMsg.textContent = message;
   errorMsg.classList.remove("hidden");
