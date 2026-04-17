@@ -6,6 +6,7 @@ const errorMsg = document.getElementById("error");
 const wordElement = document.getElementById("word");
 const phoneticsElement = document.getElementById("phonetics");
 const definitionsElement = document.getElementById("definitions");
+const synonymsElement = document.getElementById("synonyms");
 
 
 const audioBtn = document.getElementById("audioBtn");
@@ -31,6 +32,7 @@ function clearResults() {
   wordElement.textContent = "";
   phoneticsElement.textContent = "";
   definitionsElement.innerHTML = "";
+  synonymsElement.innerHTML = "";
   
 
   audioBtn.classList.add("hidden");
@@ -77,6 +79,12 @@ function showWord(data) {
       const example = document.createElement("p");
       example.textContent = `Example: ${definition.example}`;
       definitionsElement.appendChild(example);
+    }
+    // synonyms
+    if (meaning.synonyms && meaning.synonyms.length > 0) {
+      const syn = document.createElement("p");
+      syn.textContent = `Synonyms: ${meaning.synonyms.join(", ")}`;
+      synonymsElement.appendChild(syn);
     }
   });
 
